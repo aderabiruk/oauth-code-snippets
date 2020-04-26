@@ -1,9 +1,10 @@
 import { model, Schema, Document } from 'mongoose';
 
 export interface Client extends Document {
-    name: string;
-	secret: string;
-	redirect_uri: string;
+    name: String;
+	secret: String;
+	redirect_uri: String;
+	scopes: String[];
     created_at: Date;
     updated_at: Date;
     deleted_at: Date;
@@ -25,7 +26,10 @@ let ClientSchema = new Schema({
     redirect_uri: {
 		type: String,
 		required: true
-    },
+	},
+	scopes: [{
+		type: String
+	}],
 	created_at: {
 		type: Date,
 		default: Date.now,
@@ -38,6 +42,6 @@ let ClientSchema = new Schema({
 		type: Date,
 		default: null
 	}
-}, {collection: 'users'});
+}, {collection: 'clients'});
 
 export default model<Client>('Client', ClientSchema);
