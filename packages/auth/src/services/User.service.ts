@@ -81,6 +81,23 @@ class UserService {
                 });
         });
     }
+
+    /**
+     * Find User
+     * 
+     * @param {any} query
+     */
+    static findOne(query: any): Promise<any> {
+        return new Promise((resolve, reject) => {
+            UserDAL.findOne(query)
+                .then((user: User) => {
+                    resolve(user);                    
+                })
+                .catch((error: any) => {
+                    reject(new NotFoundError(error));
+                });
+        });
+    }
 };
 
 export default UserService;
