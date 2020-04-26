@@ -17,6 +17,8 @@ export const ERROR_MESSAGES = {
      * Client Error
      */
     CLIENT_NOT_FOUND_ERROR: "Client not found!",
+    CLIENT_SCOPE_INVALID_ERROR: "Invalid scopes provieded",
+    CLIENT_REDIRECT_URI_INVALID_ERROR: "Invalid redirect uri provided",
 
     /**
      * General Error
