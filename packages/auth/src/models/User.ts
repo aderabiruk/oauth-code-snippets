@@ -1,8 +1,8 @@
 import { model, Schema, Document } from 'mongoose';
 
 export interface User extends Document {
-    email: string;
-    password: string;
+    email: String;
+    password: String;
     created_at: Date;
     updated_at: Date;
     deleted_at: Date;
