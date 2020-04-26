@@ -15,7 +15,7 @@ class UserDAL {
             user.password = password;
             user.save((error, savedUser) => {
                 if (error) {
-                    reject(error);
+                    reject(error.message);
                 }
                 else {
                     resolve(savedUser);
@@ -33,7 +33,7 @@ class UserDAL {
         return new Promise((resolve, reject) => {
             User.find({...query, deleted_at: null}, (error, users) => {
                 if (error) {
-                    reject(error);
+                    reject(error.message);
                 }
                 else {
                     resolve(users);
@@ -51,7 +51,7 @@ class UserDAL {
         return new Promise((resolve, reject) => {
             User.findOne({...query, deleted_at: null}, (error, users) => {
                 if (error) {
-                    reject(error);
+                    reject(error.message);
                 }
                 else {
                     resolve(users);
