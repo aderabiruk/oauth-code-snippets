@@ -100,3 +100,6 @@ uploads/*
 !uploads/images/default.jpg
 !uploads/images/avatar.png
 !uploads/models/default
+
+# Secrets
+secrets/
