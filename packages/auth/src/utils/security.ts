@@ -7,8 +7,10 @@ import jsonwebtoken from 'jsonwebtoken';
 import LocalStrategy from 'passport-local';
 
 import { User } from '../models/User';
+import { Client } from '../models/Client';
 import UserService from '../services/User.service';
 import { ERROR_MESSAGES } from '../errors/constants';
+
 
 const PublicKey = fs.readFileSync(path.resolve(__dirname, config.get('security.keys.public')), 'utf8');
 const PrivateKey = fs.readFileSync(path.resolve(__dirname, config.get('security.keys.private')), 'utf8');
@@ -54,13 +56,31 @@ export const comparePassword = (candidatePassword: string, password: string) => 
 /**
  * Generate JWT Access Token
  * 
- * @param {User}        user
- * @param {SignOptions} signOptions
+ * @param {User}   user
+ * @param {string} expiresIn
  */
 export const generateAccessToken = (user: User, expiresIn: string) => {
     return jsonwebtoken.sign({
         _id: user._id,
         email: user.email,
+    }, PrivateKey, {
+       algorithm: "RS256",
+       expiresIn: expiresIn
+    });
+};
+
+/**
+ * Generate JWT Access Token for Client
+ * 
+ * @param {Client} client
+ * @param {string} scope
+ * @param {string} expiresIn
+ */
+export const generateAccessTokenForClient = (client: Client, scope: string, expiresIn: string) => {
+    return jsonwebtoken.sign({
+        client_id: client._id,
+        client_name: client.name,
+        scope: scope
     }, PrivateKey, {
        algorithm: "RS256",
        expiresIn: expiresIn
@@ -124,3 +144,19 @@ export const PassportJWTStrategy = new JwtStrategy.Strategy({ jwtFromRequest: Jw
             return done(null, false);
         });
 });
+
+/**
+ * Decode Base64
+ */
+export const decodeBasicAuthenticationHeader = (data: string) => {
+    if (data) {
+        let decodedHeader = Buffer.from(data.split(" ")[1], 'base64').toString().split(":");
+        return {
+            client_id: decodedHeader[0],
+            client_secret: decodedHeader[1]
+        };
+    }
+    else {
+        return {};
+    }
+};
