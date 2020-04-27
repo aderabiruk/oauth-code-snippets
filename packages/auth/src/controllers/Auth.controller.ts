@@ -1,3 +1,4 @@
+import moment from 'moment';
 import passport from 'passport';
 import evalidate from 'evalidate';
 import { Request, Response } from 'express';
@@ -28,23 +29,33 @@ class AuthController {
     static authenticate(request: Request, response: Response) {
         passport.authenticate('local', { session: false }, (error, user, info) => {
             if (error) {
-                return response.status(ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR).json((new InternalServerError(error.message)).payload);
+                return response.render("auth/login", {
+                    email: request.body.email,
+                    error: error.message
+                });
             }
             else if (!user) {
-                return response.status(ERROR_STATUS_CODES.UNAUTHORIZED_ERROR).json((new UnauhtorizedError()).payload);
+                return response.render("auth/login", {
+                    email: request.body.email,
+                    error: ERROR_MESSAGES.AUTHENTICATION_ERROR
+                });
             }
             else {
                 request.logIn(user, { session: false }, (error) => {
                     if (error) {
-                        return response.status(ERROR_STATUS_CODES.UNAUTHORIZED_ERROR).json((new UnauhtorizedError()).payload);
+                        return response.render("auth/login", {
+                            email: request.body.email,
+                            error: ERROR_MESSAGES.AUTHENTICATION_ERROR
+                        });
                     }
                     else {
                         const token = generateAccessToken(user, "30d");
-                        return response.status(200).json({
-                            _id: user._id,
-                            email: user.email,
-                            token: token
+                        response.cookie('token', token, {
+                            httpOnly: true,
+                            expires: moment().add(7, 'days').toDate(),
+                            secure: false
                         });
+                        return response.redirect("/v1/auth/verify");
                     }
                 });
             }
@@ -103,6 +114,27 @@ class AuthController {
     }
 
     /**
+     * Render Login Page
+     * 
+     * @param {Request} request
+     * @param {Response} response
+     */
+    static login(request: Request, response: Response) {
+        return response.render("auth/login", {});
+    }
+
+    /**
+     * Logout
+     * 
+     * @param request 
+     * @param response 
+     */
+    static logout(request: Request, response: Response) {
+        response.clearCookie("token")
+        return response.render("auth/login", {});
+    }
+
+    /**
      * Retrieve Access Token
      * 
      * @param {Request} request
@@ -113,13 +145,13 @@ class AuthController {
     }
 
     /**
-     * Verify JWT Token
+     * Verify JWT Access Token from Cookie
      * 
      * @param {Request} request
      * @param {Response} response
      */
-    static verifyJwtToken(request: Request, response: Response) {
-        response.json({"isValid": true, "user": request.user});
+    static verifyCookieJwtAccessToken(request: Request, response: Response) {
+        response.json({"status": "token"});
     }
 
 }
