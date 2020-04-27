@@ -1,3 +1,4 @@
+import mongooseHidden from 'mongoose-hidden';
 import { model, Schema, Document } from 'mongoose';
 
 export interface User extends Document {
@@ -18,6 +19,7 @@ let UserSchema = new Schema({
         required: true
     },
 	password: {
+        hide: true,
 		type: String,
 		required: true
     },
@@ -34,5 +36,7 @@ let UserSchema = new Schema({
 		default: null
 	}
 }, {collection: 'users'});
+
+UserSchema.plugin(mongooseHidden(), { hidden: { _id: false } });
 
 export default model<User>('User', UserSchema);
