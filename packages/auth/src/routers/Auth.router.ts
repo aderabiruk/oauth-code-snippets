@@ -10,11 +10,11 @@ router
     /**
      * Authorization Endpoint
      */
-    .get("/authorize", AuthController.authorize)
+    .get("/authorize", authenticate, AuthController.authorize)
     /**
      * Approve Endpoint
      */
-    .post("/approve", AuthController.approve)
+    .post("/approve", authenticate, AuthController.approve)
     /**
      * Login Endpoint
      */

@@ -1,12 +1,22 @@
 import moment from 'moment';
 import passport from 'passport';
 import evalidate from 'evalidate';
+import queryString from 'query-string';
 import { Request, Response } from 'express';
 
 import AuthService from '../services/Auth.service';
-import { generateAccessToken } from '../utils/security';
+import { AuthorizationCode } from '../models/AuthorizationCode';
 import { ERROR_MESSAGES, ERROR_STATUS_CODES } from '../errors/constants';
-import { BadInputError, InternalServerError, Error, UnauhtorizedError } from '../errors/errors';
+import { BadInputError, Error, UnauhtorizedError } from '../errors/errors';
+import { generateAccessToken, decodeBasicAuthenticationHeader } from '../utils/security';
+
+const QueryParamsValidationSchema = new evalidate.schema({
+    response_type: evalidate.string().required("Response Type is required.").equals("code", "Invalid response type provided."),
+    client_id: evalidate.string().required("Client Id is required."),
+    redirect_uri: evalidate.string().required("Redirect Uri is required."),
+    state: evalidate.string().required("State is required."),
+    scopes: evalidate.string().required("Scopes are required")
+});
 
 class AuthController {
     
@@ -17,7 +27,54 @@ class AuthController {
      * @param {Response} response
      */
     static approve(request: Request, response: Response) {
-        response.json({"status": "approve"});
+        const query = request.session.authorization_query;
+        if (!query) {
+            return response.render("errors/unauthorized", {
+                title: "Unauthorized",
+                error: ERROR_MESSAGES.FORBIDDEN_ERROR
+            });
+        }
+
+        let result = QueryParamsValidationSchema.validate(query)
+        if (result.isValid) {
+            request.session.destroy((error) => {
+                if (error) {
+                    return response.render("errors/unauthorized", {
+                        title: "Unauthorized",
+                        error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+                    });
+                }
+                else {
+                    AuthService.approve(query.client_id, query.redirect_uri, query.scopes)
+                        .then((authorizationCode: AuthorizationCode) => {
+                            let queryParams = queryString.stringify({
+                                code: authorizationCode.code,
+                                state: query.state
+                            });
+                            response.redirect(`${query.redirect_uri}?${queryParams}`);
+                        })
+                        .catch((error: Error) => {
+                            let errorMessage: String;
+                            if (error instanceof BadInputError) {
+                                errorMessage = error.payload.errors[0].message;
+                            }
+                            else {
+                                errorMessage = error.payload.errors[0];
+                            }
+                            return response.render("errors/unauthorized", {
+                                title: "Unauthorized",
+                                error: errorMessage
+                            });
+                        });
+                }
+            });
+        }
+        else {
+            return response.render("errors/unauthorized", {
+                title: "Unauthorized",
+                error: result.errors[0].message
+            });
+        }
     }
 
     /**
@@ -70,26 +127,24 @@ class AuthController {
      * @param {Request} request
      * @param {Response} response
      */
-    static authorize(request: Request, response: Response) {
-        let schema = new evalidate.schema({
-            response_type: evalidate.string().required("Response Type is required.").equals("code", "Invalid response type provided."),
-            client_id: evalidate.string().required("Client Id is required."),
-            redirect_uri: evalidate.string().required("Redirect Uri is required."),
-            state: evalidate.string().required("State is required."),
-            scopes: evalidate.string().required("Scopes are required")
-        });
-    
-        let result = schema.validate(request.query)
+    static authorize(request: Request, response: Response) {    
+        let user: any = request.user;
+        let result = QueryParamsValidationSchema.validate(request.query)
         if (result.isValid) {
             AuthService.authorize(request.query.response_type.toString(), request.query.client_id.toString(), request.query.redirect_uri.toString(), request.query.scopes.toString())
                 .then((status: any) => {
                     if (status.isAuthorized) {
-                        return response.render("auth/approve", {
-    
+                        request.session.authorization_query = request.query;
+                        return response.render("auth/conscent", {
+                            title: "Authorize",
+                            email: user.email,
+                            client: status.client,
+                            scope: request.query.scopes.toString().split(" ")
                         });
                     }
                     else {
                         return response.render("errors/unauthorized", {
+                            title: "Unauthorized",
                             error: ERROR_MESSAGES.FORBIDDEN_ERROR
                         });
                     }
@@ -103,6 +158,7 @@ class AuthController {
                         errorMessage = error.payload.errors[0];
                     }
                     return response.render("errors/unauthorized", {
+                        title: "Unauthorized",
                         error: errorMessage
                     });
                 });
@@ -143,7 +199,32 @@ class AuthController {
      * @param {Response} response
      */
     static token(request: Request, response: Response) {
-        response.json({"status": "token"});
+        let authorization = decodeBasicAuthenticationHeader(request.headers["authorization"]);
+        if (authorization && authorization.client_id && authorization.client_secret) {
+
+            const Schema = new evalidate.schema({
+                grant_type: evalidate.string().required("Grant Type is required.").in(["authorization_code", "refresh_token"], "Invalid grant type provided."),
+                code: evalidate.string().required("Authorization code is required."),
+                redirect_uri: evalidate.string().required("Redirect Uri is required.")
+            });
+
+            let result = Schema.validate(request.body);
+            if (result.isValid) {
+                AuthService.token(authorization.client_id, authorization.client_secret, request.body.code, request.body.redirect_uri)
+                    .then((result) => {
+                        response.status(200).json(result);
+                    })
+                    .catch((error: Error) => {
+                        return response.status(error.statusCode).json(error.payload);
+                    });
+            }
+            else {
+                return response.status(ERROR_STATUS_CODES.BAD_INPUT_ERROR).json(new BadInputError(result.errors).payload);
+            }
+        }
+        else {
+            return response.status(ERROR_STATUS_CODES.UNAUTHORIZED_ERROR).json((new UnauhtorizedError()).payload);
+        }
     }
 
     /**
