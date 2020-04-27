@@ -1,8 +1,11 @@
+import async from 'async';
 import evalidate from 'evalidate';
 import { Request, Response } from 'express';
+import PasswordValidator from 'password-validator';
 
 import { User } from '../models/User';
 import UserService from '../services/User.service';
+import { ERROR_MESSAGES } from '../errors/constants';
 import { BadInputError, Error } from '../errors/errors';
 
 class UserController {
@@ -14,24 +17,51 @@ class UserController {
      * @param {Response} response 
      */
     static create(request: Request, response: Response) {
-        let schema = new evalidate.schema({
-            email: evalidate.string().required("Email is required.").email(),
-            password: evalidate.string().required("Password is required")
-        });
-
-        let result = schema.validate(request.body);
-        if (result.isValid) {
-            UserService.create(request.body.email, request.body.password)
-                .then((user: User) => {
-                    response.status(200).json(user);
-                })
-                .catch((error: Error) => {
-                    response.status(error.statusCode).json(error.payload);
+        async.waterfall([
+            (done: Function) => {
+                let schema = new evalidate.schema({
+                    email: evalidate.string().required("Email is required.").email(),
+                    password: evalidate.string().required("Password is required")
                 });
-        }
-        else {
-            response.status(400).json(new BadInputError(result.errors).payload);
-        }
+                let result = schema.validate(request.body);
+                if (result.isValid) {
+                    done(null);                    
+                }
+                else {
+                    done(new BadInputError(result.errors));
+                }
+            },
+            (done: Function) => {
+                let schema = (new PasswordValidator())
+                                .is().min(8)
+                                .is().max(100)
+                                .has().uppercase()
+                                .has().lowercase()
+                                .has().digits();
+                
+                if (schema.validate(request.body.password)) {
+                    done(null);
+                }
+                else {
+                    done(new BadInputError([
+                        {field: "password", message: ERROR_MESSAGES.USER_PASSWORD_STRENGTH_ERROR }
+                    ]));
+                }
+            },
+            (done: Function) => {
+                UserService.create(request.body.email, request.body.password)
+                    .then((user: User) => {
+                        response.status(200).json(user);
+                    })
+                    .catch((error: Error) => {
+                        done(error);
+                    });
+            }
+        ], (error: Error) => {
+            if (error) {
+                response.status(error.statusCode).json(error.payload);
+            }
+        });
     }
 
     /**

@@ -29,4 +29,5 @@ export const ERROR_MESSAGES = {
      * User Error
      */
     USER_NOT_FOUND_ERROR: "User not found!",
+    USER_PASSWORD_STRENGTH_ERROR: "Your password must have at least 8 characters with lowercase, uppercase and numerical characters!"
 };
