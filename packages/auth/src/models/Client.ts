@@ -4,7 +4,7 @@ export interface Client extends Document {
     name: String;
 	secret: String;
 	redirect_uri: String;
-	scopes: String[];
+	scope: String[];
     created_at: Date;
     updated_at: Date;
     deleted_at: Date;
@@ -27,7 +27,7 @@ let ClientSchema = new Schema({
 		type: String,
 		required: true
 	},
-	scopes: [{
+	scope: [{
 		type: String
 	}],
 	created_at: {

@@ -18,9 +18,9 @@ class AuthService {
      * @param {String} response_type OAuth Response Type
      * @param {String} client_id     Client ID
      * @param {String} redirect_uri  Redirect URI
-     * @param {String} scopes        Scopes
+     * @param {String} scope         Scope
      */
-    static authorize(response_type: string, client_id: string, redirect_uri: string, scopes: string): Promise<any> {
+    static authorize(response_type: string, client_id: string, redirect_uri: string, scope: string): Promise<any> {
         return new Promise((resolve, reject) => {
             async.waterfall([
                 (done: Function) => {
@@ -48,8 +48,8 @@ class AuthService {
                     }
                 },
                 (client: Client, done: Function) => {
-                    let rscope = scopes ? scopes.split(" ") : [];
-                    if (_.difference(rscope, client.scopes).length > 0) {
+                    let rscope = scope ? scope.split(" ") : [];
+                    if (_.difference(rscope, client.scope).length > 0) {
                         done(new BadInputError([
                             { field: "redirect_uri", message: ERROR_MESSAGES.CLIENT_SCOPE_INVALID_ERROR }
                         ]));
@@ -74,9 +74,9 @@ class AuthService {
      * 
      * @param {String} client_id     Client ID
      * @param {String} redirect_uri  Redirect URI
-     * @param {String} scopes        Scopes 
+     * @param {String} scope        Scope 
      */
-    static approve(client_id: string, redirect_uri: string, scopes: string): Promise<any> {
+    static approve(client_id: string, redirect_uri: string, scope: string): Promise<any> {
         return new Promise((resolve, reject) => {
             async.waterfall([
                 (done: Function) => {
@@ -104,15 +104,15 @@ class AuthService {
                     }
                 },
                 (client: Client, done: Function) => {
-                    let rscope = scopes ? scopes.split(" ") : [];
-                    if (_.difference(rscope, client.scopes).length > 0) {
+                    let rscope = scope ? scope.split(" ") : [];
+                    if (_.difference(rscope, client.scope).length > 0) {
                         done(new BadInputError([
                             { field: "redirect_uri", message: ERROR_MESSAGES.CLIENT_SCOPE_INVALID_ERROR }
                         ]));
                     }
                     else {
                         let code = cryptoRandomString({ length: 10 });
-                        AuthorizationCodeDAL.create(client._id, code, scopes)
+                        AuthorizationCodeDAL.create(client._id, code, scope)
                             .then((authroizationCode: AuthorizationCode) => {
                                 resolve(authroizationCode);  
                             })

@@ -12,12 +12,12 @@ export class ClientService {
      * 
      * @param {String}  name            Client name
      * @param {String}  redirect_uri    Redirect Uri for Client
-     * @param {Array}   scopes          Client Scopes 
+     * @param {Array}   scope          Client Scope
      */
-    static create(name: String, redirect_uri: String, scopes: String[]): Promise<any> {
+    static create(name: String, redirect_uri: String, scope: String[]): Promise<any> {
         return new Promise((resolve, reject) => {
             let secret = cryptoRandomString({ length: 10 });
-            ClientDAL.create(name, secret, redirect_uri, scopes)
+            ClientDAL.create(name, secret, redirect_uri, scope)
                 .then((client: Client) => {
                     resolve(client);
                 })

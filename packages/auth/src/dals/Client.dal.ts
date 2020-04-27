@@ -8,15 +8,15 @@ class ClientDAL {
      * @param {String}   name            Client Name
      * @param {String}   secret          Client Secret
      * @param {String}   redirect_uri    Client redirect_uri
-     * @param {Array}    scopes          Client Scopes 
+     * @param {Array}    scope          Client Scope
      */
-    static create(name: String, secret: String, redirect_uri: String, scopes: String[]): Promise<any> {
+    static create(name: String, secret: String, redirect_uri: String, scope: String[]): Promise<any> {
         return new Promise((resolve, reject) => {
             let client = new Client();
             client.name = name;
             client.secret = secret;
             client.redirect_uri = redirect_uri;
-            client.scopes = scopes;
+            client.scope = scope;
             client.save((error, savedClient) => {
                 if (error) {
                     reject(error.message);

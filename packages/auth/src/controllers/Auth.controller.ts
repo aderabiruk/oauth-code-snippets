@@ -15,7 +15,7 @@ const QueryParamsValidationSchema = new evalidate.schema({
     client_id: evalidate.string().required("Client Id is required."),
     redirect_uri: evalidate.string().required("Redirect Uri is required."),
     state: evalidate.string().required("State is required."),
-    scopes: evalidate.string().required("Scopes are required")
+    scope: evalidate.string().required("Scope is required")
 });
 
 class AuthController {
@@ -45,7 +45,7 @@ class AuthController {
                     });
                 }
                 else {
-                    AuthService.approve(query.client_id, query.redirect_uri, query.scopes)
+                    AuthService.approve(query.client_id, query.redirect_uri, query.scope)
                         .then((authorizationCode: AuthorizationCode) => {
                             let queryParams = queryString.stringify({
                                 code: authorizationCode.code,
@@ -131,7 +131,7 @@ class AuthController {
         let user: any = request.user;
         let result = QueryParamsValidationSchema.validate(request.query)
         if (result.isValid) {
-            AuthService.authorize(request.query.response_type.toString(), request.query.client_id.toString(), request.query.redirect_uri.toString(), request.query.scopes.toString())
+            AuthService.authorize(request.query.response_type.toString(), request.query.client_id.toString(), request.query.redirect_uri.toString(), request.query.scope.toString())
                 .then((status: any) => {
                     if (status.isAuthorized) {
                         request.session.authorization_query = request.query;
@@ -139,7 +139,7 @@ class AuthController {
                             title: "Authorize",
                             email: user.email,
                             client: status.client,
-                            scope: request.query.scopes.toString().split(" ")
+                            scope: request.query.scope.toString().split(" ")
                         });
                     }
                     else {

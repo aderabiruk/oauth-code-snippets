@@ -18,12 +18,12 @@ class ClientController {
         let schema = new evalidate.schema({
             name: evalidate.string().required("Client name is required.").minlength(3).maxlength(10),
             redirect_uri: evalidate.string().required("Redirect Uri is required."),
-            scopes: evalidate.array().required("Scopes is required.")
+            scope: evalidate.array().required("Scope is required.")
         });
     
         let result = schema.validate(request.body)
         if (result.isValid) {
-            ClientService.create(request.body.name, request.body.redirect_uri, request.body.scopes)
+            ClientService.create(request.body.name, request.body.redirect_uri, request.body.scope)
                 .then((client: Client) => {
                     response.json(client);
                 })
