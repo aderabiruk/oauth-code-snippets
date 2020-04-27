@@ -1,0 +1,13 @@
+html
+    head
+        title #{title}
+        block styles
+            link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,900&display=swap")
+            link(rel="stylesheet", href="/public/styles/success/style.css")
+            link(rel="stylesheet", href="/public/vendors/font-awesome/css/font-awesome.min.css")
+    body
+        div(class="card")
+            div(style="border-radius:200px; height:200px; width:200px; background: #F8FAF5; margin:0 auto;")
+                i &#10003;
+            h1 Success
+            p #{message}
