@@ -17,6 +17,7 @@ export const authenticate = (request: Request, response: Response, next: Functio
         next();
     }
     else {
-        return response.redirect("/v1/auth/login");
+        request.session.redirect_uri = request.originalUrl || "/v1/auth/login";
+        return response.redirect(`/v1/auth/login`);
     }
 };

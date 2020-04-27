@@ -16,6 +16,9 @@
         "cookie": {
             "secret": "THIS_IS_THE_SECRET"
         },
+        "session": {
+            "secret": "THIS_IS_THE_SECRET"
+        },
         "hash": {
             "saltRound": 10
         },

@@ -68,6 +68,17 @@ export const generateAccessToken = (user: User, expiresIn: string) => {
 };
 
 /**
+ * Decode JWT Access Token
+ * 
+ * @param {string} token
+ */
+export const decodeAccessToken = (token: string) => {
+    return jsonwebtoken.verify(token, PublicKey, {
+        algorithms: ["RS256"]
+    });
+};
+
+/**
  * Local Strategy
  */
 export const PassportLocalStrategy = new LocalStrategy.Strategy({ usernameField: "email", passwordField: "password" }, (email, password, done) => {

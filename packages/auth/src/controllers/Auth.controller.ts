@@ -55,7 +55,9 @@ class AuthController {
                             expires: moment().add(7, 'days').toDate(),
                             secure: false
                         });
-                        return response.redirect("/v1/auth/verify");
+
+                        const redirect_uri = request.session.redirect_uri || "/v1/dashboard";
+                        return response.redirect(redirect_uri);
                     }
                 });
             }
@@ -120,7 +122,7 @@ class AuthController {
      * @param {Response} response
      */
     static login(request: Request, response: Response) {
-        return response.render("auth/login", {});
+        return response.render("auth/login", { });
     }
 
     /**
@@ -131,7 +133,7 @@ class AuthController {
      */
     static logout(request: Request, response: Response) {
         response.clearCookie("token")
-        return response.render("auth/login", {});
+        return response.render("auth/login", { });
     }
 
     /**
