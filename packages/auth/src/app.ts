@@ -1,9 +1,11 @@
 import cors from 'cors';
+import config from 'config';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import passport from 'passport';
 import bodyParser from 'body-parser';
 import compression from 'compression';
+import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import express, { Application } from 'express';
 
@@ -50,6 +52,14 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('combined'));
 app.use('/public', express.static('public'));
+
+/**
+ * Initialize Session
+ */
+app.use(session({
+    resave: false,
+    secret: config.get("security.session.secret")
+}))
 
 /**
  * Initialize Pug Template Engine
