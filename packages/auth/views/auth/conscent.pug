@@ -1,0 +1,20 @@
+extend layout.pug
+
+block content
+    div(class="row justify-content-center")
+        div(class="col-lg-5 col-md-7")
+            div(class="card bg-secondary border-0 mb-0")
+                div(class="card-header bg-transparent pb-5")
+                    div(class="text-muted text-center mt-4")
+                        h2 Welcome, #{email}
+                div(class="card-body px-lg-5 py-lg-5")
+                    div(class="text-center text-muted mb-4")
+                        h4 
+                            i #{client.name} 
+                            | would like to access your account with the following scopes:
+                        each val in scope
+                            span(class="badge badge-pill badge-primary") #{val}
+                    form(role="form" method="POST" action="/v1/auth/approve")
+                        div(class="text-center")
+                            button(type="submit" class="btn btn-success my-4") Allow
+                            button(type="button" class="btn btn-primary my-4") Deny

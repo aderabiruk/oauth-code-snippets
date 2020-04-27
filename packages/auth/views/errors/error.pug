@@ -1,0 +1,11 @@
+html
+    head
+        title #{title}
+        block styles
+            link(rel="stylesheet", href="/public/styles/errors/style.css")
+            link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Cabin:400,700")
+            link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Montserrat:900")
+    body
+        div(id="error")
+            div(class="error")
+                block error-message
