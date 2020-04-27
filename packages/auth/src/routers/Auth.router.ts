@@ -2,6 +2,7 @@ import passport from 'passport';
 import express, { Router } from 'express';
 
 import AuthController from '../controllers/Auth.controller';
+import { authenticate } from '../middlewares/CookieAuthenticate';
 
 let router: Router = express.Router();
 
@@ -17,7 +18,15 @@ router
     /**
      * Login Endpoint
      */
+    .get("/login", AuthController.login)
+    /**
+     * Login Endpoint
+     */
     .post("/login", AuthController.authenticate)
+    /**
+     * Logout Endpoint
+     */
+    .get("/logout", AuthController.logout)
     /**
      * Token Endpoint
      */
@@ -25,6 +34,6 @@ router
     /**
      * Verify Token
      */
-    .get("/verifyJwtToken", passport.authenticate('jwt', { session: false }), AuthController.verifyJwtToken);
+    .get("/verify", authenticate, AuthController.verifyCookieJwtAccessToken);
 
 export default router;
