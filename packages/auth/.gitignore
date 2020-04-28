@@ -101,5 +101,8 @@ uploads/*
 !uploads/images/avatar.png
 !uploads/models/default
 
+# Build
+dist/
+
 # Secrets
 secrets/
