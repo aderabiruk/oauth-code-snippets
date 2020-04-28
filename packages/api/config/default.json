@@ -1,0 +1,20 @@
+{
+    "name": "Protected API",
+    "version": "v1",
+    "server": {
+        "port": "3003"
+    },
+    "config": {
+        "silent": false
+    },
+    "database": {
+        "port": "27017",
+        "host": "localhost",
+        "name": "oauth-code-snippets-development-protected-api"
+    },
+    "security": {
+        "keys": {
+            "public": "../../secrets/public.key"
+        }
+    }
+}
