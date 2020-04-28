@@ -45,8 +45,8 @@ passport.deserializeUser((id: string, done: Function) => {
  * Middlewares
  */
 app.use(compression());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(cors());

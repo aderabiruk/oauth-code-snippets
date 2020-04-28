@@ -8,7 +8,7 @@ import { ERROR_MESSAGES } from '../errors/constants';
 import { AuthorizationCode } from '../models/AuthorizationCode';
 import AuthorizationCodeDAL from '../dals/AuthorizationCode.dal';
 import { generateAccessTokenForClient } from '../utils/security';
-import { NotFoundError, BadInputError, InternalServerError, UnauhtorizedError } from '../errors/errors';
+import { NotFoundError, BadInputError, InternalServerError, UnauhtorizedError, ForbiddenError } from '../errors/errors';
 
 class AuthService {
 
@@ -169,7 +169,7 @@ class AuthService {
                                 done(null, client, authorizationCode);
                             }
                             else {
-                                done(new UnauhtorizedError());
+                                done(new ForbiddenError());
                             }
                         })
                         .catch((error: any) => {

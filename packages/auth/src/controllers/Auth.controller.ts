@@ -7,7 +7,7 @@ import { Request, Response } from 'express';
 import AuthService from '../services/Auth.service';
 import { AuthorizationCode } from '../models/AuthorizationCode';
 import { ERROR_MESSAGES, ERROR_STATUS_CODES } from '../errors/constants';
-import { BadInputError, Error, UnauhtorizedError } from '../errors/errors';
+import { BadInputError, Error, UnauhtorizedError, ForbiddenError } from '../errors/errors';
 import { generateAccessToken, decodeBasicAuthenticationHeader } from '../utils/security';
 
 const QueryParamsValidationSchema = new evalidate.schema({
@@ -223,7 +223,7 @@ class AuthController {
             }
         }
         else {
-            return response.status(ERROR_STATUS_CODES.UNAUTHORIZED_ERROR).json((new UnauhtorizedError()).payload);
+            return response.status(ERROR_STATUS_CODES.FORBIDDEN_ERROR).json((new ForbiddenError()).payload);
         }
     }
 
