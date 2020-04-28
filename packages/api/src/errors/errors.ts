@@ -23,28 +23,22 @@ export class BadInputError extends Error {
     constructor(errors: any[]) {
         super(400, errors);
     }
-}
-
-export class UnauhtorizedError extends Error {
-    constructor() {
-        super(401, [ ERROR_MESSAGES.AUTHENTICATION_ERROR ]);
-    }
-}
+};
 
 export class ForbiddenError extends Error {
     constructor() {
         super(403, [ ERROR_MESSAGES.FORBIDDEN_ERROR ]);
     }
-}
+};
 
 export class NotFoundError extends Error {
     constructor(message: any) {
         super(404, [ message ]);
     }
-}
+};
 
 export class InternalServerError extends Error {
     constructor(message: any) {
         super(500, [ message ]);
     }
-}
+};

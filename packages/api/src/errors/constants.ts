@@ -10,7 +10,6 @@ export const ERROR_MESSAGES = {
     /**
      * Authenticated Related Error Messages
      */
-    AUTHENTICATION_ERROR: "Login Failed: Invalid email or password!",
     FORBIDDEN_ERROR: "Authorization Failure: You're not allowed!",
 
     /**
