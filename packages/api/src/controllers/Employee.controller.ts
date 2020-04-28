@@ -18,7 +18,7 @@ class EmployeeController {
         let schema = new evalidate.schema({
             first_name: evalidate.string().required("First name is required."),
             last_name: evalidate.string().required("Last name is required."),
-            email: evalidate.string().required("Email is required."),
+            email: evalidate.string().email().required("Email is required."),
             salary: evalidate.number().required("Salary is required."),
         });
     
