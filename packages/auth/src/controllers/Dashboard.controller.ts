@@ -1,3 +1,4 @@
+import async from 'async';
 import moment from 'moment';
 import { Request, Response } from 'express';
 
@@ -18,10 +19,44 @@ class DashboardController {
     static home(request: Request, response: Response) {
         let user: any = request.user;
 
-        return response.render("dashboard/home", {
-            title: "Dashboard",
-            email: user.email
+        async.waterfall([
+            (done: Function) => {
+                ClientService.findAll()
+                    .then((clients: Client[]) => {
+                        done(null, clients.length);
+                    })
+                    .catch((error: Error) => {
+                        done(error);
+                    });
+            },
+            (client_count: number, done: Function) => {
+                UserService.findAll()
+                    .then((users: User[]) => {
+                        done(null, client_count, users.length);
+                    })
+                    .catch((error: Error) => {
+                        done(error);
+                    });
+
+                
+            },
+            (client_count: number, user_count: number, done: Function) => {
+                return response.render("dashboard/home", {
+                    title: "Dashboard",
+                    email: user.email,
+                    client_count: client_count,
+                    user_count: user_count
+                });
+            }
+        ], (error) => {
+            if (error) {
+                return response.render("errors/internal_server_error", {
+                    title: "Internal Error",
+                    error: "Something went wrong!"
+                });
+            }
         });
+        
     }
 
     /**
@@ -31,6 +66,8 @@ class DashboardController {
      * @param {Response} response
      */
     static clients(request: Request, response: Response) {
+        let user: any = request.user;
+
         ClientService.findAll()
             .then((clients: Client[]) => {
                 return response.render("dashboard/clients", {
@@ -45,7 +82,6 @@ class DashboardController {
                     error: "Something went wrong!"
                 });
             });
-        let user: any = request.user;
     }
 
     /**
@@ -55,6 +91,8 @@ class DashboardController {
      * @param {Response} response
      */
     static users(request: Request, response: Response) {
+        let user: any = request.user;
+
         UserService.findAll()
             .then((users: User[]) => {
                 users.map((user) => ({ ...user, createdAt: moment(user.created_at).format("YYYY-MM-DD")}));
@@ -70,7 +108,6 @@ class DashboardController {
                     error: "Something went wrong!"
                 });
             });
-        let user: any = request.user;
     }
 }
 
