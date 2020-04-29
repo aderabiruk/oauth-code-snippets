@@ -1,3 +1,4 @@
+import async from 'async';
 import axios from 'axios';
 import config from 'config';
 import evalidate from 'evalidate';
@@ -98,6 +99,79 @@ class AuthController {
                 error: result.errors[0].message
             });
         }
+    }
+
+    /**
+     * Dashboard
+     * 
+     * @param {Request} request 
+     * @param {Response} response 
+     */
+    static dashboard(request: Request, response: Response) {
+        if (request.query.delete === "access_token") {
+            RedisClient.del("access_token");
+        }
+        if (request.query.delete === "refresh_token") {
+            RedisClient.del("refresh_token");
+        }
+
+        async.waterfall([
+            (done: Function) => {
+                RedisClient.get("access_token", (error, access_token) => {
+                    if (error) {
+                        done(error.message);
+                    }
+                    else {
+                        done(null, access_token);
+                    }
+                });
+            },
+            (access_token: string, done: Function) => {
+                RedisClient.get("refresh_token", (error, refresh_token) => {
+                    if (error) {
+                        done(error.message);
+                    }
+                    else {
+                        done(null, access_token, refresh_token);
+                    }
+                });
+            },
+            (access_token: string, refresh_token: string, done: Function) => {
+                let configuration = {
+                    headers: {
+                        'Authorization': `Bearer ${access_token}`,
+                    }
+                };
+
+                let url = config.get("api.server.url") + "/v1/employee"
+                axios.get(url, configuration)
+                    .then((result) => {
+                        return response.render("home/home", {
+                            error: false,
+                            title: "Dashboard",
+                            employees: result.data,
+                            access_token: access_token,
+                            refresh_token: refresh_token
+                        });
+                    })
+                    .catch((error) => {
+                        return response.render("home/home", {
+                            error: true,
+                            employees: [],
+                            title: "Dashboard",
+                            access_token: access_token,
+                            refresh_token: refresh_token
+                        });
+                    });
+            }
+        ], (error) => {
+            if (error) {
+                return response.render("errors/internal_server_error", {
+                    title: "Internal Error",
+                    error: error
+                });
+            }
+        });
     }
 }
 

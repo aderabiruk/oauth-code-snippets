@@ -12,6 +12,10 @@ router
     /**
      * Callback Endpoint
      */
-    .get("/callback", AuthController.callback);
+    .get("/callback", AuthController.callback)
+    /**
+     * Dasboard
+     */
+    .get("/dashboard", AuthController.dashboard);
 
 export default router;

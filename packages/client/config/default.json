@@ -17,6 +17,11 @@
             "private": "../../secrets/private.key"
         }
     },
+    "api": {
+        "server": {
+            "url": "http://localhost:3003"
+        }
+    },
     "sso": {
         "server": {
             "authorization_url": "http://localhost:3001/v1/auth/authorize",

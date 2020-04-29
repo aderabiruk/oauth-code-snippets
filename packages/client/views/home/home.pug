@@ -1,0 +1,52 @@
+extend layout.pug
+
+block content
+    div(class="row")
+        div(class="col-xl-6")
+            div(class="card card-stats")
+                div(class="card-body")
+                    div(class="row")
+                        div(class="col")
+                            h5(class="card-title text-uppercase text-muted mb-0") Access Token
+                            br
+                            textarea(class="form-control" id="exampleFormControlTextarea1" rows="6") #{access_token}
+                            br
+                            a(href="/v1/auth/dashboard?delete=access_token" class="btn btn-danger float-right") Clear
+        div(class="col-xl-6")
+            div(class="card card-stats")
+                div(class="card-body")
+                    div(class="row")
+                        div(class="col")
+                            h5(class="card-title text-uppercase text-muted mb-0") Refresh Token
+                            br
+                            textarea(class="form-control" id="exampleFormControlTextarea1" rows="6") #{refresh_token}
+                            br
+                            a(href="/v1/auth/dashboard?delete=refresh_token" class="btn btn-danger float-right") Clear
+    div(class="row")
+        div(class="col-xl-12")
+            div(class="card")
+                div(class="card-header border-0")
+                    div(class="row align-items-center")
+                        div(class="col")
+                            h3(class="mb-0") Employees
+                div(class="table-responsive")
+                    table(class="table align-items-center table-flush")
+                        thead(class="thead-light")
+                            tr
+                                th First Name
+                                th Last Name
+                                th Email
+                                th Salary
+                        tbody
+                            if error
+                                tr
+                                    td(class="text-center" colspan="4") 
+                                        div You're Unauthorized
+                                            a(href="/v1/auth/authorize" class="btn btn-sm btn-outline-primary ml-2") Login
+                            else
+                                each employee, index in employees
+                                    tr
+                                        td #{employee.first_name}
+                                        td #{employee.last_name}
+                                        td #{employee.email}
+                                        td #{employee.salary}
