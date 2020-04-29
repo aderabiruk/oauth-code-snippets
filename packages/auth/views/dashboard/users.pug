@@ -1,0 +1,23 @@
+extend layout.pug
+
+block content
+    div(class="row")
+        div(class="col-xl-12")
+            div(class="card")
+                div(class="card-header border-0")
+                    div(class="row align-items-center")
+                        div(class="col")
+                            h3(class="mb-0") Users
+                div(class="table-responsive")
+                    table(class="table align-items-center table-flush")
+                        thead(class="thead-light")
+                            tr
+                                th #
+                                th Email
+                                th Created At
+                        tbody
+                            each user, index in users
+                                tr
+                                    td #{index + 1}
+                                    td #{user.email}
+                                    td #{user.created_at}

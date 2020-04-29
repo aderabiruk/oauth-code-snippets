@@ -9,6 +9,14 @@ router
     /**
      * Home
      */
-    .get("/", authenticate, DashboardController.home);
+    .get("/", authenticate, DashboardController.home)
+    /**
+     * Clients
+     */
+    .get('/clients', authenticate, DashboardController.clients)
+    /**
+     * Users
+     */
+    .get('/users', authenticate, DashboardController.users);
 
 export default router;
