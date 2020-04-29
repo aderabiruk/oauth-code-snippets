@@ -1,0 +1,30 @@
+{
+    "name": "Authorization Server",
+    "version": "v1",
+    "server": {
+        "port": "3001"
+    },
+    "config": {
+        "silent": false
+    },
+    "database": {
+        "port": "27017",
+        "host": "localhost",
+        "name": "oauth-code-snippets-development-authorization-server"
+    },
+    "security": {
+        "cookie": {
+            "secret": "THIS_IS_THE_SECRET"
+        },
+        "session": {
+            "secret": "THIS_IS_THE_SECRET"
+        },
+        "hash": {
+            "saltRound": 10
+        },
+        "keys": {
+            "public": "../../secrets/public.key",
+            "private": "../../secrets/private.key"
+        }
+    }
+}

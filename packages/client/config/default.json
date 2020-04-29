@@ -1,0 +1,38 @@
+{
+    "name": "Client Application",
+    "version": "v1",
+    "server": {
+        "port": "3002"
+    },
+    "config": {
+        "silent": false
+    },
+    "redis": {
+        "host": "localhost",
+        "port": "6379"
+    },
+    "security": {
+        "keys": {
+            "public": "../../secrets/public.key",
+            "private": "../../secrets/private.key"
+        }
+    },
+    "api": {
+        "server": {
+            "url": "http://localhost:3003"
+        }
+    },
+    "sso": {
+        "server": {
+            "authorization_url": "http://localhost:3001/v1/auth/authorize",
+            "token_url": "http://localhost:3001/v1/auth/token"
+        },
+        "client": {
+            "client_id": "5ea74c8b1228fd226b34f06f",
+            "client_name": "Client #1",
+            "client_secret": "7790b8f182",
+            "redirect_uri": "http://localhost:3002/v1/auth/callback",
+            "scope": "employees.viewer employees.editor"
+        }
+    }
+}
